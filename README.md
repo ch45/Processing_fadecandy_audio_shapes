@@ -2,7 +2,7 @@
 Processing fadecandy audio shapes
 ---------------------------------
 
-But it's not yet, is a WIP...
+Currently does something but a bit crap...
 
 Cmd Line
 --------

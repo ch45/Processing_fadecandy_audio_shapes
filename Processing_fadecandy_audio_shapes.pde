@@ -6,6 +6,15 @@
 
 import java.util.ArrayDeque;
 
+import ddf.minim.analysis.*;
+import ddf.minim.*;
+
+Minim minim;
+AudioPlayer sound; // mp3 input
+// AudioInput sound; // microphone input
+FFT fftLog;
+final int maxAmplitude = 255;
+
 OPC opc;
 
 final int boxesAcross = 2;
@@ -21,7 +30,7 @@ int y0;
 int exitTimer = 0;
 
 // Start a FIFO stack
-ArrayList<ShapeFlyer> flyerStack = new ArrayList<ShapeFlyer>();
+ArrayList<SoundTriggeredShape> flyerStack = new ArrayList<SoundTriggeredShape>();
 
 public void setup() {
 
@@ -47,29 +56,40 @@ public void setup() {
     }
   }
 
+  minim = new Minim(this);
+
+  sound = minim.loadFile("083_trippy-ringysnarebeat-3bars.mp3", 1024);  // mp3 input
+  // sound = minim.getLineIn(Minim.MONO, 1024); // microphone input
+
+  // loop the file
+  sound.loop(); // mp3 input
+
+  // create an FFT object for calculating logarithmically spaced averages
+  fftLog = new FFT(sound.bufferSize(), sound.sampleRate()); // may fail if the microphone device is already in use!
+
+  fftLog.logAverages(22, 3);
+  // fftLog.logAverages(11, 1);
+
   // ShapeFlyer one = new ShapeFlyer(598.0, 478.0, 24, 36, 4, 280, -0.8, -0.8);
   for (int i = 0; i < 10; i++) {
-    ShapeFlyer one = new ShapeFlyer(x0, y0, (int)(x0 + spacing * boxesAcross * ledsAcross), (int)(y0 + spacing * boxesDown * ledsDown), spacing);
+    SoundTriggeredShape one = new SoundTriggeredShape(x0, y0, (int)(x0 + spacing * boxesAcross * ledsAcross), (int)(y0 + spacing * boxesDown * ledsDown), spacing);
     flyerStack.add(one);
   }
 }
 
 public void draw() {
 
-  int count = 0;
+  fftLog.forward(sound.mix);
+
   background(0);
 
-  for (ShapeFlyer cur: flyerStack) {
+  for (SoundTriggeredShape cur: flyerStack) {
+
+    cur.check(fftLog);
+
     if (cur.valid()) {
       cur.draw();
       cur.move();
-      count++;
-    }
-  }
-
-  if (count == 0) {
-    for (ShapeFlyer cur: flyerStack) {
-      cur.reset();
     }
   }
 

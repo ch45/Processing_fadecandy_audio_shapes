@@ -20,6 +20,9 @@ public class ShapeFlyer
   int hue;
   int weight;
 
+  ShapeFlyer() { // implicitly called
+  }
+
   ShapeFlyer(
     int initX,
     int initY,
