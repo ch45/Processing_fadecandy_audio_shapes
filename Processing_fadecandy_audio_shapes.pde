@@ -16,6 +16,8 @@ FFT fftLog;
 final int maxAmplitude = 255;
 
 OPC opc;
+final String fcServerHost = "127.0.0.1";
+final int fcServerPort = 7890;
 
 final int boxesAcross = 2;
 final int boxesDown = 2;
@@ -41,7 +43,7 @@ public void setup() {
   colorMode(HSB, 360, 100, 100);
 
   // Connect to the local instance of fcserver
-  opc = new OPC(this, "127.0.0.1", 7890);
+  opc = new OPC(this, fcServerHost, fcServerPort);
 
   spacing = (float)min(height / (boxesDown * ledsDown + 1), width / (boxesAcross * ledsAcross + 1));
   x0 = (int)(width - spacing * (boxesAcross * ledsAcross - 1)) / 2;
@@ -92,6 +94,8 @@ public void draw() {
       cur.move();
     }
   }
+
+  text(String.format("%5.1f fps", frameRate), 5, 15);
 
   check_exit();
 }
